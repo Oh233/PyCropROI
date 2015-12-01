@@ -39,6 +39,8 @@ while True:
         image = clone.copy()
     elif key == ord("c"):
         break
+    elif key == ord(" "):
+        print 'hello my world'
 
 
 if len(refPt) == 2:
