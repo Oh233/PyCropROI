@@ -1,17 +1,12 @@
-import argparse
 import cv2
+import os
 
 # initialize bounding box points and boolean
 # indicating whether cropping is being performed
 refPt = []
 cropping = False
-
-ap = argparse.ArgumentParser()
-ap.add_argument("-i", "--image", required=True, help="Path to the image")
-args = vars(ap.parse_args())
-
-image = cv2.imread(args["image"])
-clone = image.copy()
+imagePath = "./wholeImage/"
+record_file = open('record.txt', 'w')
 
 
 def click_and_crop(event, x, y, flags, param):
@@ -28,27 +23,35 @@ def click_and_crop(event, x, y, flags, param):
         cv2.rectangle(image, refPt[0], refPt[1], (0, 255, 0), 2)
         cv2.imshow("image", image)
 
-cv2.namedWindow("image")
-cv2.setMouseCallback("image", click_and_crop)
 
-while True:
-    cv2.imshow("image", image)
-    key = cv2.waitKey(1) & 0xFF
+if __name__ == '__main__':
 
-    if key == ord("r"):
-        image = clone.copy()
-    elif key == ord("c"):
-        break
-    elif key == ord(" "):
-        print 'hello my world'
+    imageNames = os.listdir(imagePath)
+    cv2.namedWindow("image")
+    cv2.setMouseCallback("image", click_and_crop)
 
+    for image_name in imageNames:
+        image = cv2.imread(os.path.join('wholeImage', image_name))
+        clone = image.copy()
+        while True:
+            cv2.imshow("image", image)
+            key = cv2.waitKey(1) & 0xFF
 
-if len(refPt) == 2:
-    roi = clone[refPt[0][1]: refPt[1][1], refPt[0][0]:refPt[1][0]]
-    cv2.imshow("ROI", roi)
-    cv2.waitKey(0)
+            if key == ord("r"):
+                image = clone.copy()
+            elif key == ord(" "):
+                """ recording body """
+                cv2.rectangle(image, refPt[0], refPt[1], (0, 255, 0), 2)
+                cv2.imshow("image", image)
+                record_file.write("%s\n" % image_name)
+                for item in refPt:
+                    record_file.write("%d %d\n" % item)
+                del refPt[:]
+            elif key == ord("q"):
+                break
 
-cv2.destroyAllWindows()
+    record_file.close()
+    cv2.destroyAllWindows()
 
 
 

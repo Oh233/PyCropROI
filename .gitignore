@@ -58,3 +58,5 @@ target/
 
 # PyCharm stuff
 .idea/
+
+wholeImage/*
